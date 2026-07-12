@@ -17,7 +17,7 @@ public class UserFakeRepository {
         User admin = new User(authCredentials.admin(), authCredentials.password(), Collections.singleton(new SimpleGrantedAuthority("ADMIN")) );
 
         User user = new User(authCredentials.user(), authCredentials.password(), Collections.singleton(new SimpleGrantedAuthority("USER")));
-//password is 123 TODO update when migrate to database
+//password is 123
         USER_LIST.add(admin);
         USER_LIST.add(user);
     }

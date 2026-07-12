@@ -3,8 +3,8 @@ package com.example.foodidentity.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.foodidentity.model.AuthCredentials;
 import com.example.foodidentity.service.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -18,10 +18,13 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC256;
 
 @Component
 public class JwtUtil {
-@Autowired
-UserDetailsServiceImpl userDetailsService;
+
+    private final AuthCredentials authCredentials;
     private static final long EXPIRATION_TIME = 1000*60*60;//1HOUR
-    private static final String SECRET = "my-super-secret-key-that-is-long-enough-1234567890!@#";// TODO: Will get updated
+    public JwtUtil(AuthCredentials authCredentials) {
+        this.authCredentials = authCredentials;
+    }
+
     public String generateToken(String userName, Collection<? extends GrantedAuthority> authorities) {
 
         boolean isAdmin = authorities.stream()
@@ -34,7 +37,7 @@ UserDetailsServiceImpl userDetailsService;
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .withClaim("role", role)
-                .sign(HMAC256(SECRET));
+                .sign(HMAC256(authCredentials.secret()));
     }
 
     public String extractUserName(String token) {
@@ -43,7 +46,7 @@ UserDetailsServiceImpl userDetailsService;
     }
 
     private DecodedJWT extractTokenInfo(String token) {
-        JWTVerifier jwtVerifier = JWT.require(HMAC256(SECRET)).build();
+        JWTVerifier jwtVerifier = JWT.require(HMAC256(authCredentials.secret())).build();
         return jwtVerifier.verify(token);
     }
 
