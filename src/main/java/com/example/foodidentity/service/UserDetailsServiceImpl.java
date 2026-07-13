@@ -1,10 +1,13 @@
 package com.example.foodidentity.service;
 
+import com.example.foodidentity.entity.User;
 import com.example.foodidentity.repository.UserFakeRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -16,10 +19,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (userDao.getUserByUsername(username).isEmpty()) {
-            throw new RuntimeException("no user found");
-        }
-
-        return userDao.getUserByUsername(username).get();
+        return userDao.getUserByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 }

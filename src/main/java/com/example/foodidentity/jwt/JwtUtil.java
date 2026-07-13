@@ -52,6 +52,6 @@ public class JwtUtil {
 
     public Set<SimpleGrantedAuthority> getTokenAuthority(String token) {
         DecodedJWT decodedJWT = extractTokenInfo(token);
-        return  Collections.singleton(new SimpleGrantedAuthority(decodedJWT.getClaim("role").toString()));
+        return  Collections.singleton(new SimpleGrantedAuthority(decodedJWT.getClaim("role").asString()));
     }
 }
