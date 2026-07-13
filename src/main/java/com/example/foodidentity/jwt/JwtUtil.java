@@ -20,7 +20,7 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC256;
 public class JwtUtil {
 
     private final AuthCredentials authCredentials;
-    private static final long EXPIRATION_TIME = 1000*60*60;//1HOUR
+    private static final long EXPIRATION_TIME = 1000*60* 5;//5min
     public JwtUtil(AuthCredentials authCredentials) {
         this.authCredentials = authCredentials;
     }
