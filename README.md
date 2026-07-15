@@ -2,7 +2,7 @@
 
 ## Service Overview 
 This service is the core authentication engine for the Food Market MVP. 
-It uses a user’s username and password to generate jwt tokens, which provide security for authenticating the user when they log in.
+It authenticates users via their credentials and generates JWTs to establish secure sessions.
 
 ## Prerequisite 
 Before running this service, ensure you have the following installed and configured on your machine:
@@ -14,10 +14,11 @@ Before running this service, ensure you have the following installed and configu
   * `APP_SECURITY_ADMIN`: Default admin username
   * `APP_SECURITY_USER` : Default standard username
   * `APP_SECURITY_PASSWORD`: Default password for users
-  * `APP_SECURITY_SECRET`: Secret key to sign in and generate jwt tokens.
+  * `APP_SECURITY_SECRET`: Secret key to sign in and generate JWTs.
 
 ## Running Locally
 To start the application on your local machine, open your terminal in the root directory of this project and run the following command:
 
 ```bash
 mvn spring-boot:run
+```
