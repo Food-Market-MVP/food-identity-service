@@ -29,13 +29,13 @@ class ControllerTest {
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("USER"));
         doReturn(authorities).when(authentication).getAuthorities();
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
-        when(jwtUtil.generateToken(eq("sam"), eq(authorities))).thenReturn("token");
+        when(jwtUtil.generateToken(eq("midlyn"), eq(authorities))).thenReturn("token");
 
-        String token = new AuthController(jwtUtil, authenticationManager).generateToken(new AuthRequest("sam", "password"));
+        String token = new AuthController(jwtUtil, authenticationManager).generateToken(new AuthRequest("midlyn", "password"));
 
         assertEquals("token", token);
         verify(authenticationManager).authenticate(any());
-        verify(jwtUtil).generateToken("sam", authorities);
+        verify(jwtUtil).generateToken("midlyn", authorities);
     }
 
     @Test
@@ -46,7 +46,7 @@ class ControllerTest {
         when(authenticationManager.authenticate(any())).thenThrow(failure);
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> new AuthController(jwtUtil, authenticationManager).generateToken(new AuthRequest("sam", "wrong")));
+                () -> new AuthController(jwtUtil, authenticationManager).generateToken(new AuthRequest("midlyn", "wrong")));
 
         assertEquals(failure, thrown);
     }

@@ -68,7 +68,7 @@ class JwtAuthFilterTest {
 
     @Test
     void doFilterInternalAuthenticatesValidTokenWhenContextIsEmpty() throws Exception {
-        String token = jwtUtil.generateToken("sam", List.of(() -> "USER"));
+        String token = jwtUtil.generateToken("midlyn", List.of(() -> "USER"));
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
         MockHttpServletResponse response = new MockHttpServletResponse();
@@ -76,7 +76,7 @@ class JwtAuthFilterTest {
 
         filter.doFilterInternal(request, response, chain);
 
-        assertEquals("sam", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        assertEquals("midlyn", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         assertEquals("ROLE_USER", SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority());
         verify(chain).doFilter(request, response);
     }
@@ -101,7 +101,7 @@ class JwtAuthFilterTest {
     void doFilterInternalKeepsExistingAuthenticationForValidTokenWithSubject() throws Exception {
         UsernamePasswordAuthenticationToken existingAuthentication = UsernamePasswordAuthenticationToken.authenticated("existing", null, List.of());
         SecurityContextHolder.getContext().setAuthentication(existingAuthentication);
-        String token = jwtUtil.generateToken("sam", List.of(() -> "USER"));
+        String token = jwtUtil.generateToken("midlyn", List.of(() -> "USER"));
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
         MockHttpServletResponse response = new MockHttpServletResponse();

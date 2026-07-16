@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UserDetailsServiceImplTest {
@@ -39,11 +38,11 @@ class UserDetailsServiceImplTest {
     @Test
     void userExposesAndUpdatesAccountStateFields() {
         User user = new User();
-        user.setUsername("sam");
+        user.setUsername("midlyn");
         user.setPassword("secret");
         user.setAuthorities(Set.of(() -> "ROLE_USER"));
 
-        assertEquals("sam", user.getUsername());
+        assertEquals("midlyn", user.getUsername());
         assertEquals("secret", user.getPassword());
         assertEquals("ROLE_USER", user.getAuthorities().iterator().next().getAuthority());
         assertEquals(true, user.isAccountNonExpired());
