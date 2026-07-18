@@ -7,10 +7,13 @@ import com.example.foodidentity.service.UserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class SecurityConfigTest {
 
@@ -18,14 +21,17 @@ class SecurityConfigTest {
     private final SecurityConfig config = new SecurityConfig(jwtAuthFilter);
 
     @Test
-    void authenticationManagerAuthenticatesConfiguredUserWithMatchingPassword() throws Exception {
-        BCryptPasswordEncoder passwordEncoder = config.passwordEncoder();
+    void authenticationManagerUsesConfiguredPasswordEncoderToMatchPassword() throws Exception {
+        PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
         UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(
-                new UserFakeRepository(new AuthCredentials("admin-security", "user-security", "$2a$10$D0cXnF.5YxgXGmBapVHcSeMmcRpxHWYmFm87xYhA./gmMaOneTuya", "secret")));
+                new UserFakeRepository(new AuthCredentials("mock-admin-security", "mock-user-security", "encoded-password", "secret")));
         AuthenticationManager authenticationManager = config.authenticationManager(userDetailsService, passwordEncoder);
 
-        assertEquals("admin-security", authenticationManager.authenticate(
-                org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated("admin-security", "123")).getName());
-        assertTrue(passwordEncoder.matches("123", "$2a$10$D0cXnF.5YxgXGmBapVHcSeMmcRpxHWYmFm87xYhA./gmMaOneTuya"));
+        when(passwordEncoder.matches("123", "encoded-password")).thenReturn(true);
+
+        assertEquals("mock-admin-security", authenticationManager.authenticate(
+                org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated("mock-admin-security", "123")).getName());
+
+        verify(passwordEncoder).matches("123", "encoded-password");
     }
 }

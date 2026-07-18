@@ -20,7 +20,6 @@ class UserDetailsServiceImplTest {
     void loadUserByUsernameReturnsStoredUser() {
         User user = mock(User.class);
         when(repository.getUserByUsername("admin-test")).thenReturn(Optional.of(user));
-        when(user.getUsername()).thenReturn("admin-test");
 
         assertEquals("admin-test", service.loadUserByUsername("admin-test").getUsername());
     }
