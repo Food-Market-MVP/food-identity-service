@@ -21,17 +21,19 @@ import static org.mockito.Mockito.when;
 
 class ControllerTest {
 
+    private final JwtUtil jwtUtil = mock(JwtUtil.class);
+    private final AuthenticationManager authenticationManager = mock(AuthenticationManager.class);
+    private final AuthController authController = new AuthController(jwtUtil, authenticationManager);
+
     @Test
     void generateTokenAuthenticatesRequestAndReturnsGeneratedToken() {
-        JwtUtil jwtUtil = mock(JwtUtil.class);
-        AuthenticationManager authenticationManager = mock(AuthenticationManager.class);
         Authentication authentication = mock(Authentication.class);
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("USER"));
         doReturn(authorities).when(authentication).getAuthorities();
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(jwtUtil.generateToken(eq("midlyn"), eq(authorities))).thenReturn("token");
 
-        String token = new AuthController(jwtUtil, authenticationManager).generateToken(new AuthRequest("midlyn", "password"));
+        String token = authController.generateToken(new AuthRequest("midlyn", "password"));
 
         assertEquals("token", token);
         verify(authenticationManager).authenticate(any());
@@ -40,13 +42,11 @@ class ControllerTest {
 
     @Test
     void generateTokenPropagatesAuthenticationFailure() {
-        JwtUtil jwtUtil = mock(JwtUtil.class);
-        AuthenticationManager authenticationManager = mock(AuthenticationManager.class);
         IllegalArgumentException failure = new IllegalArgumentException("invalid credentials");
         when(authenticationManager.authenticate(any())).thenThrow(failure);
 
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
-                () -> new AuthController(jwtUtil, authenticationManager).generateToken(new AuthRequest("midlyn", "wrong")));
+                () -> authController.generateToken(new AuthRequest("midlyn", "wrong")));
 
         assertEquals(failure, thrown);
     }

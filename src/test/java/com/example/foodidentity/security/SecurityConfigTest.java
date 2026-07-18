@@ -14,9 +14,11 @@ import static org.mockito.Mockito.mock;
 
 class SecurityConfigTest {
 
+    private final JwtAuthFilter jwtAuthFilter = mock(JwtAuthFilter.class);
+    private final SecurityConfig config = new SecurityConfig(jwtAuthFilter);
+
     @Test
     void authenticationManagerAuthenticatesConfiguredUserWithMatchingPassword() throws Exception {
-        SecurityConfig config = new SecurityConfig(mock(JwtAuthFilter.class));
         BCryptPasswordEncoder passwordEncoder = config.passwordEncoder();
         UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(
                 new UserFakeRepository(new AuthCredentials("admin-security", "user-security", "$2a$10$D0cXnF.5YxgXGmBapVHcSeMmcRpxHWYmFm87xYhA./gmMaOneTuya", "secret")));

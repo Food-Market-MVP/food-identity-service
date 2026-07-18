@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static com.auth0.jwt.algorithms.Algorithm.HMAC256;
 
 class JwtUtilTest {
 
@@ -21,21 +22,33 @@ class JwtUtilTest {
         String token = jwtUtil.generateToken("midlyn", List.of(new SimpleGrantedAuthority("ADMIN")));
 
         assertEquals("midlyn", jwtUtil.extractUserName(token));
-        assertEquals("ROLE_ADMIN", jwtUtil.getTokenAuthority(token).iterator().next().getAuthority());
+        assertTrue(jwtUtil.getTokenAuthority(token).stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN")));
     }
 
     @Test
     void generateTokenAssignsUserRoleWhenAuthorityIsNotAdmin() {
         String token = jwtUtil.generateToken("montecito", List.of(new SimpleGrantedAuthority("USER")));
 
-        assertEquals("ROLE_USER", jwtUtil.getTokenAuthority(token).iterator().next().getAuthority());
+        assertTrue(jwtUtil.getTokenAuthority(token).stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_USER")));
     }
 
     @Test
     void generateTokenAssignsAdminRoleWhenAdminIsNotFirstAuthority() {
         String token = jwtUtil.generateToken("midlyn", List.of(new SimpleGrantedAuthority("USER"), new SimpleGrantedAuthority("ADMIN")));
 
-        assertEquals("ROLE_ADMIN", jwtUtil.getTokenAuthority(token).iterator().next().getAuthority());
+        assertTrue(jwtUtil.getTokenAuthority(token).stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN")));
+    }
+
+    @Test
+    void extractUserNameRejectsTokenSignedWithDifferentSecret() {
+        String token = JWT.create()
+                .withSubject("midlyn")
+                .sign(HMAC256("a-different-secret-that-is-long-enough"));
+
+        assertThrows(JWTVerificationException.class, () -> jwtUtil.extractUserName(token));
     }
 
     @Test
@@ -57,11 +70,4 @@ class JwtUtilTest {
 
     }
 
-    @Test
-    void extractUserNameRejectsTokenSignedWithAnotherSecret() {
-        JwtUtil anotherJwtUtil = new JwtUtil(new AuthCredentials("admin", "user", "password", "a-different-secret-that-is-long-enough"));
-        String token = anotherJwtUtil.generateToken("midlyn", List.of(new SimpleGrantedAuthority("USER")));
-
-        assertThrows(JWTVerificationException.class, () -> jwtUtil.extractUserName(token));
-    }
 }

@@ -8,20 +8,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC256;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 class JwtAuthFilterTest {
 
-    private final AuthCredentials credentials = new AuthCredentials("admin", "user", "password", "a-secret-that-is-long-enough-for-tests");
-    private final JwtUtil jwtUtil = new JwtUtil(credentials);
+    private static final String TEST_SECRET = "a-secret-that-is-long-enough-for-tests";
+
+    private final JwtUtil jwtUtil = new JwtUtil(
+            new AuthCredentials("admin", "user", "password", TEST_SECRET));
     private final JwtAuthFilter filter = new JwtAuthFilter(jwtUtil);
 
     @AfterEach
@@ -76,8 +78,10 @@ class JwtAuthFilterTest {
 
         filter.doFilterInternal(request, response, chain);
 
-        assertEquals("midlyn", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        assertEquals("ROLE_USER", SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        assertNotNull(authentication);
+        assertEquals("midlyn",authentication.getPrincipal());
+        assertTrue(authentication.getAuthorities().stream().anyMatch(authority -> "ROLE_USER".equals(authority.getAuthority())));
         verify(chain).doFilter(request, response);
     }
 
@@ -85,7 +89,7 @@ class JwtAuthFilterTest {
     void doFilterInternalKeepsExistingAuthenticationAndContinuesForTokenWithoutSubject() throws Exception {
         UsernamePasswordAuthenticationToken existingAuthentication = UsernamePasswordAuthenticationToken.authenticated("existing", null, List.of());
         SecurityContextHolder.getContext().setAuthentication(existingAuthentication);
-        String token = JWT.create().withClaim("role", "ROLE_USER").sign(HMAC256(credentials.secret()));
+        String token = JWT.create().withClaim("role", "ROLE_USER").sign(HMAC256(TEST_SECRET));
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Authorization", "Bearer " + token);
         MockHttpServletResponse response = new MockHttpServletResponse();

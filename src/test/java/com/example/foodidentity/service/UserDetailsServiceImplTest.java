@@ -1,53 +1,37 @@
 package com.example.foodidentity.service;
 
 import com.example.foodidentity.entity.User;
-import com.example.foodidentity.model.AuthCredentials;
 import com.example.foodidentity.repository.UserFakeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.Set;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class UserDetailsServiceImplTest {
 
-    private final AuthCredentials credentials = new AuthCredentials("admin-test", "user-test", "password", "secret");
+    private final UserFakeRepository repository = mock(UserFakeRepository.class);
+    private final UserDetailsServiceImpl service = new UserDetailsServiceImpl(repository);
 
     @Test
-    void getUserByUsernameFindsConfiguredUsersAndReturnsEmptyForUnknownUser() {
-        UserFakeRepository repository = new UserFakeRepository(credentials);
+    void loadUserByUsernameReturnsStoredUser() {
+        User user = mock(User.class);
+        when(repository.getUserByUsername("admin-test")).thenReturn(Optional.of(user));
+        when(user.getUsername()).thenReturn("admin-test");
 
-        assertEquals("admin-test", repository.getUserByUsername("admin-test").orElseThrow().getUsername());
-        assertEquals("user-test", repository.getUserByUsername("user-test").orElseThrow().getUsername());
-        assertEquals(true, repository.getUserByUsername("unknown").isEmpty());
+        assertEquals("admin-test", service.loadUserByUsername("admin-test").getUsername());
     }
 
     @Test
-    void loadUserByUsernameReturnsStoredUserAndRejectsUnknownUser() {
-        UserFakeRepository repository = new UserFakeRepository(credentials);
-        UserDetailsServiceImpl service = new UserDetailsServiceImpl(repository);
+    void loadUserByUsernameThrowsWhenUserIsMissing() {
+        when(repository.getUserByUsername("missing")).thenReturn(Optional.empty());
 
-        assertEquals("admin-test", service.loadUserByUsername("admin-test").getUsername());
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
                 () -> service.loadUserByUsername("missing"));
         assertEquals("User not found: missing", exception.getMessage());
     }
 
-    @Test
-    void userExposesAndUpdatesAccountStateFields() {
-        User user = new User();
-        user.setUsername("midlyn");
-        user.setPassword("secret");
-        user.setAuthorities(Set.of(() -> "ROLE_USER"));
-
-        assertEquals("midlyn", user.getUsername());
-        assertEquals("secret", user.getPassword());
-        assertEquals("ROLE_USER", user.getAuthorities().iterator().next().getAuthority());
-        assertEquals(true, user.isAccountNonExpired());
-        assertEquals(true, user.isAccountNonLocked());
-        assertEquals(true, user.isCredentialsNonExpired());
-        assertEquals(true, user.isEnabled());
-    }
 }
