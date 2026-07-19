@@ -2,7 +2,6 @@ package com.example.foodidentity.service;
 
 import com.example.foodidentity.entity.User;
 import com.example.foodidentity.repository.UserFakeRepository;
-import org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
