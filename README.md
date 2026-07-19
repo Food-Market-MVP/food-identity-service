@@ -22,3 +22,13 @@ To start the application on your local machine, open your terminal in the root d
 ```bash
 mvn spring-boot:run
 ```
+
+## Testing the API locally 
+Once the application is running, you can test the authentication endpoint by sending a POST request to the server.
+
+Open a new terminal window and run the `curl` command: 
+```bash
+curl -X POST http://localhost:8080/v1/authenticate \
+  -H "Content-Type: application/json" \
+  -d '{"username": "user", "password": "123"}'
+```
