@@ -6,11 +6,9 @@ import com.example.foodidentity.repository.UserFakeRepository;
 import com.example.foodidentity.service.UserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
