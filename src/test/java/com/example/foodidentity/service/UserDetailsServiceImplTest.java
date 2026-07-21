@@ -30,22 +30,27 @@ class UserDetailsServiceImplTest {
     @Test
     void loadUserByUsername_UserExists_ReturnUserDetails() {
         Set<GrantedAuthority> authority = Set.of(new SimpleGrantedAuthority("ROLE_USER"));
-        User fakeId = new User("danny", "password123", authority);
+        User expectedUser = new User("danny", "password123", authority);
 
-        when(userDao.getUserByUsername(fakeId.getUsername())).thenReturn(Optional.of(fakeId));
+        when(userDao.getUserByUsername(expectedUser.getUsername())).thenReturn(Optional.of(expectedUser));
 
-        UserDetails result = userDetailsService.loadUserByUsername(fakeId.getUsername());
+        UserDetails result = userDetailsService.loadUserByUsername(expectedUser.getUsername());
+
         assertNotNull(result, "The returned user should not be null");
+        assertEquals(expectedUser.getUsername(), result.getUsername(), "The username should match the requested user");
+        assertEquals(expectedUser.getPassword(), result.getPassword(), "The password should match the requested password" );
 
-        verify(userDao, times(1)).getUserByUsername(fakeId.getUsername());
+        verify(userDao, times(1)).getUserByUsername(expectedUser.getUsername());
     }
 
     @Test
     void loadUserByUsername_UserDoesNotExists_ThrowsException() {
         String unknownName = "ghost";
+
         when(userDao.getUserByUsername(unknownName)).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () -> {userDetailsService.loadUserByUsername(unknownName);});
+
         verify(userDao, times(1)).getUserByUsername(unknownName);
     }
 }
