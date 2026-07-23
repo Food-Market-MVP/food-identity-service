@@ -25,4 +25,8 @@ public class UserFakeRepository {
     public Optional<User> getUserByUsername(String username) {
         return USER_LIST.stream().filter(user -> user.getUsername().equals(username)).findFirst();
     }
+
+    public void save(User user) {
+        USER_LIST.add(user);
+    }
 }
