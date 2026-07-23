@@ -1,6 +1,7 @@
 package com.example.foodidentity.service;
 
 import com.example.foodidentity.entity.User;
+import com.example.foodidentity.exception.UsernameAlreadyExistsException;
 import com.example.foodidentity.model.RegistrationRequest;
 import com.example.foodidentity.repository.UserFakeRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,15 +21,13 @@ public class RegistrationService {
     }
 
     public void register(RegistrationRequest registrationRequest) {
-        if (userRepository.getUserByUsername(registrationRequest.username()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
-        }
-
         User user = new User(
                 registrationRequest.username(),
                 passwordEncoder.encode(registrationRequest.password()),
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
 
-        userRepository.save(user);
+        if (!userRepository.registerIfAbsent(user)) {
+            throw new UsernameAlreadyExistsException(registrationRequest.username());
+        }
     }
 }
