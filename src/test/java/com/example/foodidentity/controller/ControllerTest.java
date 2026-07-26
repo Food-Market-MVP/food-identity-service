@@ -2,6 +2,7 @@ package com.example.foodidentity.controller;
 
 import com.example.foodidentity.jwt.JwtUtil;
 import com.example.foodidentity.model.AuthRequest;
+import com.example.foodidentity.service.RegistrationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -23,7 +24,8 @@ class ControllerTest {
 
     private final JwtUtil jwtUtil = mock(JwtUtil.class);
     private final AuthenticationManager authenticationManager = mock(AuthenticationManager.class);
-    private final AuthController authController = new AuthController(jwtUtil, authenticationManager);
+    private final RegistrationService registrationService = mock(RegistrationService.class);
+    private final AuthController authController = new AuthController(jwtUtil, authenticationManager, registrationService);
 
     @Test
     void generateTokenAuthenticatesRequestAndReturnsGeneratedToken() {

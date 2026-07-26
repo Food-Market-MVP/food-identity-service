@@ -9,12 +9,6 @@ Before running this service, ensure you have the following installed and configu
 
 * **Java:** JDK 21
 * **Maven** Installed 
-* **Environment Variables:**
-  You will need to configure the following environment variables locally 
-  * `APP_SECURITY_ADMIN`: Default admin username
-  * `APP_SECURITY_USER` : Default standard username
-  * `APP_SECURITY_PASSWORD`: Default password for users
-  * `APP_SECURITY_SECRET`: Secret key to sign in and generate JWTs.
 
 ## Running Locally
 To start the application on your local machine, open your terminal in the root directory of this project and run the following command:
@@ -32,3 +26,27 @@ curl -X POST http://localhost:8080/v1/authenticate \
   -H "Content-Type: application/json" \
   -d '{"username": "user", "password": "123"}'
 ```
+
+## Run with Docker
+
+Build the image from the repository root:
+
+```bash
+docker build --tag food-identity:local .
+```
+
+Create a local `.env` file containing the required security configuration:
+
+```properties
+APP_SECURITY_ADMIN=admin
+APP_SECURITY_USER=user
+APP_SECURITY_PASSWORD=<bcrypt-password-hash>
+APP_SECURITY_SECRET=<long-random-jwt-signing-secret>
+```
+
+Run the container with those values. The service is available on port `8081`:
+
+```bash
+docker run --rm --env-file .env --publish 8081:8081 food-identity:local
+```
+
