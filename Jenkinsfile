@@ -28,7 +28,7 @@ pipeline {
                     sh '''#!/bin/sh
                         while IFS= read -r credential || [ -n "$credential" ]; do
                           case "$credential" in
-                            ''|\#*) continue ;;
+                            ''|'#'*) continue ;;
                             DB_HOST=*|DB_PORT=*|DB_NAME=*|DB_USERNAME=*|DB_PASSWORD=*)
                               export "$credential"
                               ;;
